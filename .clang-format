@@ -1,0 +1,17 @@
+BasedOnStyle: LLVM
+Language: Cpp
+ColumnLimit: 100
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+PointerAlignment: Left
+ReferenceAlignment: Left
+IncludeBlocks: Regroup
+SortIncludes: true
+AllowShortFunctionsOnASingleLine: Inline
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: Align
+BreakBeforeBraces: Attach
+SpaceAfterCStyleCast: false
+Standard: c++20

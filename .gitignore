@@ -1,0 +1,11 @@
+build/
+data/
+*.tiktoken
+!tests/fixtures/**
+bench/corpus/
+__pycache__/
+*.pyc
+.cache/
+compile_commands.json
+cmake-build-*/
+.venv/
