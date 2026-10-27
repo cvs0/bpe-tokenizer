@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cc: gcc
+            cxx: g++
+            build: Release
+            sanitizers: OFF
+            native: OFF
+          - cc: clang
+            cxx: clang++
+            build: Release
+            sanitizers: OFF
+            native: OFF
+          - cc: clang
+            cxx: clang++
+            build: Debug
+            sanitizers: ON
+            native: OFF
+    steps:
+      - uses: actions/checkout@v4
+      - name: packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build python3 g++ clang
+          sudo apt-get install -y "libclang-rt-$(clang++ -dumpversion | cut -d. -f1)-dev"
+      - name: vocabs
+        run: python3 scripts/download_vocabs.py --dest data
+      - name: configure
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+          -DBPE_SANITIZERS=${{ matrix.sanitizers }}
+          -DBPE_NATIVE=${{ matrix.native }}
+          -DBPE_BUILD_PYTHON=OFF
+      - name: build
+        run: cmake --build build
+      - name: test
+        run: ctest --test-dir build --output-on-failure
