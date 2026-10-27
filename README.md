@@ -187,4 +187,6 @@ Hugging Face `Tokenizer.from_pretrained("gpt2")`, same corpus and chunking, same
 | 1 | 4096 | 7991163 | 5.927508 | 3.224 |
 | 4 | 4096 | 7991163 | 1.902958 | 10.043 |
 
+The 1.501 MB/s whole-file row is `Tokenizer.encode` on one 19111618-byte string. ByteLevel regex splitting dominates it. On `sqlite3.c` (9089564 bytes), one `ByteLevel.pre_tokenize_str` call took 4.545 s (2.00 MB/s): 2438800 pieces, longest piece 80 bytes. The following `encode` took 6.589 s (1.38 MB/s). Pieces are under the 128-byte heap threshold, so the merge is not the gap. `bpe bench --repeats 1` on that file took 0.481 s (18.898 MB/s). The 4096-byte slices raise the Hugging Face rate to 3.224 MB/s by shortening each regex input.
+
 Separate check, not the table above: the corpus decoded as Unicode text and cut into successive slices of 262144 scalars. tiktoken 0.14.0 `gpt2` `encode_ordinary` and `tokenizers` 0.23.3 GPT-2 produced the same ids (7987961 tokens). SHA-256 of little-endian `uint32` length then ids, per slice: `a8c0f5d91208809006d8aa3c7e91fe0ec964b24b5a4e5ffb15e0d59382e944c0`.
